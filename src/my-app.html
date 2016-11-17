@@ -255,11 +255,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       updateSigninStatus: function(isSignedIn) {
         if (isSignedIn) {
-          console.log('Logged in', isSignedIn);
+          // console.log('Logged in', isSignedIn);
           var response = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
-          console.log(response);
-          this.$.authenticate.body = {token: response.id_token};
-          this.$.authenticate.generateRequest();
+          // console.log(response);
+          // this.$.authenticate.body = {token: response.id_token};
+          // this.$.authenticate.generateRequest();
         }
       },
       loginClicked: function (event) {

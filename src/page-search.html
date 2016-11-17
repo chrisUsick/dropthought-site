@@ -18,6 +18,9 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <dom-module id="page-search">
 
   <template>
@@ -29,9 +32,20 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
       }
 
       .contentContainer {
+        @apply(--layout-vertical);
+        @apply(--layout-wrap);
+        @apply(--layout-center-justified);
+      }
+
+      .products {
         @apply(--layout-horizontal);
         @apply(--layout-wrap);
         @apply(--layout-center-justified);
+      }
+
+      .tabs {
+        margin-left: 32px;
+        background-color: #fff;
       }
 
       paper-card {
@@ -50,19 +64,36 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
     </style>
 
     <div class="contentContainer">
-      <template is="dom-repeat" items="{{plans}}">
-        <paper-card heading="{{item.name}}" image="https://dummyimage.com/640x480/aaa/fff&text=blah">
-          <div class="card-content">
-            {{item.description}}
-          </div>
-          <div class="card-actions">
-            <paper-button on-tap="learnMore" plan-id="[[item.id]]">Learn More</paper-button>
-            <paper-button>Purchase</paper-button>
-          </div>
-        </paper-card>
-      </template>
+      <div class="tabs">
+        <paper-tabs selected="{{selectedTagIndex}}" scrollable>
+          <template is="dom-repeat" items="{{tags}}">
+            <paper-tab>{{item.name}}</paper-tab>
+          </template>
+        </paper-tabs>
+      </div>
+      <div class="products">
+        <template id="productsRepeater" is="dom-repeat" items="{{products}}" filter="filterProducts">
+          <paper-card heading="{{item.name}}" image="https://dummyimage.com/640x480/aaa/fff&text=blah">
+            <div class="card-content">
+              {{item.description}}
+            </div>
+            <div class="card-actions">
+              <paper-button on-tap="learnMore" plan-id="[[item.id]]">Learn More</paper-button>
+              <paper-button>Purchase</paper-button>
+            </div>
+          </paper-card>
+        </template>
+      </div>
+
     </div>
 
+  <iron-ajax
+      id="ajaxSearch"
+      url="http://localhost:3000/api/products/search"
+      params="{{params}}"
+      last-response="{{searchResult}}"
+      handle-as="json"
+      on-response="onAjaxSearchResponse"></iron-ajax>
   </template>
 
   <script>
@@ -73,14 +104,23 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
       properties: {
         search: {
           type: String,
-          notify: true
+          notify: true,
+          observer: '_searchChanged'
         },
-        plans: {
+        products: {
           type:Array,
           notify:true,
           value: function(){return []}
         },
         route: {
+          type:Object,
+          notify: true
+        },
+        selectedTagIndex: {
+          type: Number,
+          observer: '_selectedTagIndexChanged'
+        },
+        selectedTag: {
           type:Object,
           notify: true
         }
@@ -90,20 +130,41 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         this.set('search', '');
       },
       ready: function() {
-        this.set('plans', [
+        var products = [
           {
             name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-            id: 1
+            id: 1, tags: [1]
           },{
             name: 'Tiny house on wheels', description:'L ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-            id: 1
+            id: 1, tags: [3]
           },{
             name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus f',
-            id: 1
+            id: 1, tags: []
           },
-        ])
+        ];
+        tags = [{id: 1, name: 'gokart'}, {id: 2, name:'house'}, {id: 3, name:'Tiny House'}]
+        this.set('searchResult', {products: products, tags: tags});
+        this.onAjaxSearchResponse(null);
+      },
+      _searchChanged: function() {
+        console.log('search changed');
+      },
+      onAjaxSearchResponse: function(ev) {
+        this.products = this.searchResult.products;
+        this.tags = this.searchResult.tags;
+      },
+      _selectedTagIndexChanged: function() {
+        var tag = this.tags[this.selectedTagIndex];
+        this.selectedTag = tag;
+        this.$.productsRepeater.render();
+      },
+      filterProducts: function(product) {
+        if (this.selectedTag) {
+          return product.tags && product.tags.indexOf(this.selectedTag.id);
+        } else {
+          return true;
+        }
       }
-
     });
 
   </script>
