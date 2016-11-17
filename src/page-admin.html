@@ -1,0 +1,189 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="dt-message-dialog.html">
+<dom-module id="page-admin">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+
+      }
+
+      .contentContainer {
+        @apply(--layout-vertical);
+
+      }
+
+
+      .product {
+        @apply(--layout-horizontal);
+      }
+
+      .product iron-image {
+        width: 50px;
+        height: 50px;
+      }
+
+      .product h3 {
+        margin: 0;
+      }
+
+      .product h3 a {
+        color: black;
+      }
+
+      .product * {
+        margin: 4px;
+      }
+      .card-content {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+      }
+
+      .small {
+        color: var(--paper-grey-500);
+        @apply(--paper-font-caption);
+        margin-left: 1em;
+      }
+      paper-item-body {
+        --paper-item-body-secondary {
+          white-space:normal;
+        }
+      }
+      .products-header {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-center);
+      }
+
+      .products-header paper-button {
+        background-color: var(--paper-green-500);
+      }
+
+      .button-wrapper {
+        display: inline-block;
+      }
+    </style>
+
+    <div class="contentContainer">
+      <paper-card heading="Admin Panel">
+        <div class="card-content">
+          <div class="products">
+            <div class="products-header">
+              <h1>Products</h1>
+              <div class="button-wrapper">
+                <paper-button raised>New</paper-button>
+              </div>
+            </div>
+            <template is="dom-repeat" items="{{products}}">
+              <div class="product">
+                <iron-image src="{{item.image}}"></iron-image>
+                <h3><a href="/admin/product/{{item.id}}">{{item.name}}</a></h3>
+              </div>
+            </template>
+          </div>
+          <div class="messages">
+            <h1>Messages</h1>
+            <paper-listbox>
+              <template is="dom-repeat" items="{{messages}}">
+                <paper-item on-tap="messageTapped">
+                  <paper-item-body two-line>
+                    <div>{{item.from.displayName}}<span class="small">{{item.product.name}}</span></div>
+                    <div secondary>[[formatMessageContent(item.content)]]</div>
+                  </paper-item-body>
+                  <dt-message-dialog id="messageDialog" message="{{item}}"></dt-message-dialog>
+                </paper-item>
+              </template>
+            </paper-listbox>
+
+          </div>
+          <div class="orders">
+            <h1><a href="/admin/orders">New Orders</a></h1>
+            <template is="dom-repeat" items="{{orders}}">
+              <paper-item>
+                <paper-item-body>
+                  <div class="">
+                    {{item.product.name}}
+                  </div>
+                  <div secondary>
+                    {{item.dateCreated}}
+                  </div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-admin',
+      properties: {
+        products: {
+          type:Array
+        },
+        messages: {
+          type: Array
+        }
+      },
+      ready: function() {
+        this.set('products', [
+          {
+            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+            id: 1, image: 'https://placeholdit.imgix.net/~text?txtsize=33&w=50&h=50'
+          },{
+            name: 'Tiny house on wheels 2', description:'L ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+            id: 1, image: 'https://placeholdit.imgix.net/~text?txtsize=33&w=50&h=50'
+          },{
+            name: 'Not so Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus f',
+            id: 1, image: 'https://placeholdit.imgix.net/~text?txtsize=33&w=50&h=50'
+          }
+        ]);
+
+        this.set('messages', [
+          {
+            from: {displayName: 'Bob Bob'}, content: 'rem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus.',
+            product: {name: 'Tiny House on Wheels'}
+          },
+          {
+            from: {displayName: 'Tom rum'}, content: 'elit. Nullam vulputate erat vitae lacus tristique c',
+            product: {name: 'Tiny House on Wheels'}
+          }
+        ]);
+
+        this.set('orders', [
+          {
+            product: {name: 'Tiny House on Wheels'}, dateCreated: '2016-11-09T16:52:09.770Z'
+          }
+        ])
+      },
+
+      formatMessageContent: function(content) {
+        var maxChars = 85;
+        var ending = content.length > maxChars ? '...' : ''
+        return content.slice(0, maxChars) + ending;
+      },
+      messageTapped: function(ev) {
+        console.log('message tapped', ev);
+        ev.currentTarget.querySelector('#messageDialog').open();
+      }
+
+    });
+
+  </script>
+
+</dom-module>

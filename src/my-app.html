@@ -1,0 +1,282 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<dom-module id="my-app">
+
+  <template>
+
+    <style>
+
+      :host {
+        display: block;
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+      }
+
+      app-header {
+        background-color: var(--app-primary-color);
+        color: #fff;
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        line-height: 40px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+      }
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+      .drawer-list a.subroute {
+        padding-left: 32px;
+      }
+
+      app-toolbar {
+        @apply(--layout-horizontal);
+      }
+
+      .title {
+        padding-right: 1em;
+      }
+
+      .add-space {
+        @apply(--layout-flex);
+      }
+
+    </style>
+
+    <app-location id="location" route="{{route}}" query-params="{{queryParams}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/plan/:id"
+        data="{{planRouteData}}"></app-route>
+    <app-route
+        route="{{route}}"
+        pattern="/wishlist/:id/customize"
+        data="{{wishlistCustomizationData}}"
+        active="{{wishlistCustomizeActive}}"
+        ></app-route>
+    <app-route
+        route="{{route}}"
+        pattern="/admin/product/new"
+        data="{{adminProductNewData}}"
+        active="{{adminProductNewActive}}"
+        ></app-route>
+    <app-route
+        route="{{route}}"
+        pattern="/admin/product/:id"
+        data="{{adminProductData}}"
+        active="{{adminProductActive}}"
+        ></app-route>
+
+    <app-route
+        route="{{route}}"
+        pattern="/admin/orders/:id"
+        data="{{adminOrderData}}"
+        active="{{adminOrderActive}}"
+        ></app-route>
+    <app-route
+        route="{{route}}"
+        pattern="/admin/orders"
+        data="{{adminOrdersData}}"
+        active="{{adminOrdersActive}}"
+        ></app-route>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+
+
+    <app-header-layout fullbleed has-scrolling-region>
+
+        <app-header condenses reveals fixed effects="waterfall">
+          <app-toolbar>
+            <div class="title">My App</div>
+            <paper-input label="Search" class="main-title" no-label-float type="search" value="{{queryParams.search}}">
+              <iron-icon icon="search" prefix></iron-icon>
+            </paper-input>
+            <div class="add-space">
+            </div>
+            <a href="/wishlist">
+              <paper-icon-button icon="card-giftcard" class="align-right"></paper-icon-button>
+            </a>
+            <a href="/admin">
+              <paper-icon-button icon="social:person" class="align-right"></paper-icon-button>
+            </a>
+            <paper-button on-tap="loginClicked">Login</paper-button>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
+          <page-home name="home"></page-home>
+          <page-search id="pageSearch" name="search" route="{{route}}" search="{{queryParams.search}}"></page-search>
+          <page-plan name="plan" id="pagePlan" product-id="{{planRouteData.id}}"></page-plan>
+          <page-wishlist name="wishlist" id="pageWishlist"></page-wishlist>
+          <page-wishlist-customize name="wishlist-customize" id="pageWishlistCustomize"></page-wishlist-customize>
+          <page-admin name="admin" id="pageAdmin"></page-admin>
+          <page-admin-product name="admin-product" id="pageAdminProduct" data="adminProductData"></page-admin-product>
+          <page-admin-product-new name="admin-product-new" id="pageAdminProductNew"></page-admin-product-new>
+          <page-admin-order name="admin-order" id="pageAdminOrder" data="adminOrderData"></page-admin-order>
+          <page-admin-orders name="admin-orders" id="pageAdminOrders" data="adminOrdersData"></page-admin-orders>
+          <page-404 name="404"></page-404>
+        </iron-pages>
+
+      </app-header-layout>
+
+  <iron-ajax
+      id="authenticate"
+      url="http://localhost:3000/api/auth/google"
+      content-type="application/json"
+      last-response="{{authenticateResponse}}"
+      last-error="{{authenticateError}}"
+      handle-as="json"
+      method="POST"
+      headers='{"Access-Control-Allow-Origin":"localhost:3000", "Access-Control-Allow-Headers": "*", "access-token":''}'
+      on-response="onAuthenticateResponse"></iron-ajax>
+  <iron-ajax
+      id="products"
+      url="http://localhost:3000/api/products"
+      last-response="{{products}}"
+      on-response="onProductsResponse"
+      content-type="applicaiton-json"
+      handle-as="json"></iron-ajax>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'my-app',
+
+      properties: {
+
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        },
+        queryParams: {
+          type:Object,
+          reflectToAttribute: true
+        },
+        search: {
+          type: String,
+          notify: true
+        }
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)',
+        '_searchChanged(queryParams.search)'
+      ],
+
+      _routePageChanged: function(page) {
+        // map of route data object to page name
+        var routeMap = {
+          'wishlistCustomizeActive': 'wishlist-customize',
+          'adminProductActive': 'admin-product',
+          'adminOrdersActive': 'admin-orders',
+          'adminProductNewActive': 'admin-product-new'
+        };
+        for (var dataProp in routeMap) {
+          var routeActive = this.get(dataProp);
+          if (routeActive) {
+            page = routeMap[dataProp];
+          }
+        }
+        this.page = page || 'home';
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showPage404: function() {
+        this.page = '404';
+      },
+
+      _searchChanged: function(data) {
+        if (this.route && this.route.path && this.queryParams.search && this.queryParams.search.trim() != '' && !this.$.location.path.match(/search/)) {
+          this.set('route.path', '/search');
+        }
+      },
+      initClient: function() {
+        console.log('initClient');
+        var self = this;
+        gapi.client.init({
+            apiKey: 'AIzaSyAOkXTdDYF9zE_QHnAK9_1GE73Z0yweIQ4',
+            discoveryDocs: ["https://people.googleapis.com/$discovery/rest?version=v1"],
+            clientId: '232215442852-v9gtrr919f6bbc2grlqgfktiihaoutnm.apps.googleusercontent.com',
+            scope: 'profile'
+        }).then(function () {
+          // Listen for sign-in state changes.
+          gapi.auth2.getAuthInstance().isSignedIn.listen(self.updateSigninStatus);
+
+          // Handle the initial sign-in state.
+          self.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+        });
+      },
+      updateSigninStatus: function(isSignedIn) {
+        if (isSignedIn) {
+          console.log('Logged in', isSignedIn);
+          var response = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
+          console.log(response);
+          this.$.authenticate.body = {token: response.id_token};
+          this.$.authenticate.generateRequest();
+        }
+      },
+      loginClicked: function (event) {
+        gapi.auth2.getAuthInstance().signIn();
+      },
+      onAuthenticateResponse: function(ev, request) {
+        headers = request.xhr.getAllResponseHeaders()
+        console.log(ev, this.authenticateResponse, this.authenticateError, headers);
+        this.$.products.generateRequest();
+      },
+      onProductsResponse: function(ev, request) {
+        console.log(ev, this.products, arguments);
+      }
+
+
+    });
+
+  </script>
+
+</dom-module>

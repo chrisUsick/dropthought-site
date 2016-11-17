@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<dom-module id="dt-write-message">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        /*padding: 10px;*/
+        @apply(--layout-horizontal);
+      }
+      h4 {
+        margin: 0;
+        display: inline;
+      }
+      p {
+        margin: 0;
+      }
+      paper-textarea {
+        @apply(--layout-flex);
+      }
+    </style>
+    <paper-textarea label="Write a message" value="{{value}}"></paper-textarea>
+    <paper-button raised>Submit</paper-button>
+  </template>
+  <script>
+    Polymer({
+      is: 'dt-write-message',
+      properties: {
+        value: String
+      }
+    })
+  </script>
+</dom-module>

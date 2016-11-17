@@ -1,0 +1,74 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+based of of demo: https://polymerelements.github.io/app-layout/templates/landing-page/#services
+  -->
+
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<dom-module id="page-home">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      header {
+        @apply(--layout-vertical);
+        @apply(--layout-center-center);
+        height: calc(100vh - 64px);
+        padding: 0 16px;
+        background-image: url('https://dummyimage.com/1200x800/aaa/fff&text=++');
+        backgrond-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        text-align: center;
+      }
+
+      header > h2 {
+        font-size: 56px;
+        font-weight: 300;
+        margin: 0;
+      }
+      header > p {
+        font-size: 32px;
+      }
+    </style>
+
+    <div class="contentContainer">
+      <header>
+        <h2>Main message</h2>
+        <p>
+          subtitle
+          <paper-icon-button icon="print"></paper-icon-button>
+          <iron-icon prefix></iron-icon>
+        </p>
+
+      </header>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-home'
+
+    });
+
+  </script>
+
+</dom-module>

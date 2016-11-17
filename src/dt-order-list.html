@@ -1,0 +1,84 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="dt-order-list">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      paper-card {
+        display: inline-block;
+      }
+
+      .card-actions {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+
+      .card-heading h2 {
+        margin-bottom: 0;
+      }
+      .card-heading {
+        padding: 0 16px;
+      }
+    </style>
+
+    <template is="dom-repeat" items="{{orders}}">
+      <paper-card>
+        <div class="card-heading">
+          <div>
+            <h2>{{item.product.name}} </h2>
+          </div>
+          <span class="small">{{item.dateCreated}}</span>
+        </div>
+        <div class="card-content">
+          <ul>
+            <template is="dom-repeat" items="{{item.customizations}}" as="customization">
+                <li>
+                  <span>{{customization.title}}</span>
+                </li>
+            </template>
+          </ul>
+        </div>
+        <div class="card-actions">
+          <paper-button hidden$="[[_hideStatusNew(item.status)]]">Reject</paper-button>
+          <paper-button hidden$="[[_hideStatusNew(item.status)]]">Verify</paper-button>
+          <paper-button hidden$="[[_hideStatusVerified(item.status)]]">Finish</paper-button>
+        </div>
+      </paper-card>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      is: 'dt-order-list',
+      properties: {
+        orders: {
+          type:Array,
+          value: function() {return []}
+        }
+      },
+      _hideStatusNew: function(status) {
+        return status != 'new';
+
+      },
+      _hideStatusVerified: function(status) {
+        return status != 'verified';
+
+      },
+      _capitalize: function(status) {
+        var first = status[0];
+        return first.toLocaleUpperCase() + status.slice(1, status.length);
+      },
+      ready: function() {
+
+      }
+    })
+  </script>
+
+</dom-module>

@@ -1,0 +1,155 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+based of of demo: https://polymerelements.github.io/app-layout/templates/landing-page/#services
+  -->
+
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="plan-image-slider.html">
+<link rel="import" href="x-collapse.html">
+
+<dom-module id="page-plan">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .contentContainer {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        @apply(--layout-center-justified);
+      }
+
+      paper-card {
+        display:block;
+        @apply(--layout-flex-1);
+         @apply(--layout-self-start);
+        margin: 1em;
+      }
+
+      .plan-header {
+        @apply(--paper-font-headline);
+      }
+
+      .plan-header iron-image {
+        width: 48px;
+        height: 48px;
+        border-radius: 48px;
+      }
+
+      .image-reel iron-image {
+        width: 120px;
+        height: 80px;
+      }
+
+      .plan-header {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+      }
+
+      .plan-header iron-image {
+        margin-right: 0.6em;
+      }
+      @media all and (min-width: 480px) and (max-width: 1920px) {
+        paper-card {
+          max-width: 720px;
+          margin: 2em;
+        }
+      }
+    </style>
+    <div class="contentContainer">
+
+      <paper-card >
+          <div class="card-content">
+            <div class="plan-header">
+              <iron-image sizing="contain" src="https://dummyimage.com/120x120/aaa/fff&text=++"></iron-image>
+              <span>{{plan.name}}</span>
+            </div>
+            <div class="image-reel">
+              <plan-image-slider images="{{plan.images}}"></plan-image-slider>
+            </div>
+
+            <x-collapse heading="Details">
+              <div class="collapse-content">
+                {{plan.description}}
+              </div>
+            </x-collapse>
+
+            <x-collapse heading="Customizations">
+              <div class="collapse-content">
+                <template is="dom-repeat" items="{{plan.customizations}}">
+                  <h4>{{item.title}}</h4>
+                  <p>
+                    {{item.description}}
+                  </p>
+                </template>
+              </div>
+            </x-collapse>
+
+          </div>
+          <div class="card-actions">
+            <paper-button>Add to Wishlist</paper-button>
+          </div>
+        </paper-card>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-plan',
+      properties: {
+        plan: {
+          type:Object,
+          notify:true,
+          value: function(){return {}}
+        },
+        productId: {
+          type: Number,
+          notify: true
+        }
+      },
+      ready: function() {
+        this.set('plan',
+          {
+            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+            images: [
+              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_1'},
+              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_2'},
+              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_3'},
+              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_4'},
+              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_5'},
+              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_6'}
+            ],
+            customizations: [
+              {title: 'Customization 1', description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s'},
+              {title: 'Customization 2', description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s'}
+            ]
+          })
+      }
+
+    });
+
+  </script>
+
+</dom-module>

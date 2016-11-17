@@ -1,0 +1,42 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<dom-module id="dt-customization-edit">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        /*padding: 10px;*/
+      }
+      h4 {
+        margin: 0;
+        display: inline;
+      }
+    </style>
+    <div>
+      <h4>{{customization.title}}</h4>
+      <span>{{customization.description}}</span>
+    </div>
+    <span>Price: ${{customization.price}}</span>
+    <div>
+      <paper-checkbox checked="{{customization.selected}}">Add Customization</paper-checkbox>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is:'dt-customization-edit',
+      properties: {
+        customization: {
+          type: Object,
+          notify: true
+        }
+      },
+      ready: function() {
+        console.log(this);
+      }
+    })
+  </script>
+</dom-module>

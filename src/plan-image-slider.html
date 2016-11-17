@@ -1,0 +1,66 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="plan-image-slider">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      #slider iron-image {
+
+        width: 120px;
+        height: 80px;
+      }
+
+      #slider {
+        /*@apply(--layout-horizontal);*/
+        /*@apply(--layout-wrap);*/
+      }
+
+
+    </style>
+    <div class="contentContainer">
+      <div id="slider">
+        <template is="dom-repeat" items="{{images}}">
+          <iron-image sizing="contain" src="{{item.url}}"></iron-image>
+        </template>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'plan-image-slider',
+      properties: {
+        images: {
+          type: Array,
+          notify: true,
+          value: function() {return []}
+        }
+      },
+      ready: function() {
+        // new SimpleSlider(this.$.slider);
+        console.log(this.images);
+        var self = this;
+        setTimeout(function(){console.log(self.images)}, 100);
+        this.async(function(){
+          if (self.images.length > 5) {
+            self.set('images', self.images.slice(0, 5));
+          }
+        }, 10);
+      }
+
+    });
+
+  </script>
+
+</dom-module>

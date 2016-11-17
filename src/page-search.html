@@ -1,0 +1,111 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+based of of demo: https://polymerelements.github.io/app-layout/templates/landing-page/#services
+  -->
+
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<dom-module id="page-search">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .contentContainer {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        @apply(--layout-center-justified);
+      }
+
+      paper-card {
+        display:block;
+        @apply(--layout-flex-1);
+         @apply(--layout-self-start);
+        margin: 1em;
+      }
+
+      @media all and (min-width: 480px) and (max-width: 1920px) {
+        paper-card {
+          max-width: 350px;
+          margin: 2em;
+        }
+      }
+    </style>
+
+    <div class="contentContainer">
+      <template is="dom-repeat" items="{{plans}}">
+        <paper-card heading="{{item.name}}" image="https://dummyimage.com/640x480/aaa/fff&text=blah">
+          <div class="card-content">
+            {{item.description}}
+          </div>
+          <div class="card-actions">
+            <paper-button on-tap="learnMore" plan-id="[[item.id]]">Learn More</paper-button>
+            <paper-button>Purchase</paper-button>
+          </div>
+        </paper-card>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-search',
+      properties: {
+        search: {
+          type: String,
+          notify: true
+        },
+        plans: {
+          type:Array,
+          notify:true,
+          value: function(){return []}
+        },
+        route: {
+          type:Object,
+          notify: true
+        }
+      },
+      learnMore: function(e) {
+        this.set('route.path', '/plan/' + e.target.planId);
+        this.set('search', '');
+      },
+      ready: function() {
+        this.set('plans', [
+          {
+            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+            id: 1
+          },{
+            name: 'Tiny house on wheels', description:'L ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+            id: 1
+          },{
+            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus f',
+            id: 1
+          },
+        ])
+      }
+
+    });
+
+  </script>
+
+</dom-module>

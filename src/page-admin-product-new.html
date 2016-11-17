@@ -1,0 +1,38 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="dt-product-edit.html">
+<dom-module id="page-admin-product-new">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .contentContainer {
+        @apply(--layout-vertical);
+      }
+
+    </style>
+
+    <div class="contentContainer">
+
+      <dt-product-edit product="{{product}}"></dt-product-edit>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-admin-product-new'
+    });
+
+  </script>
+
+</dom-module>

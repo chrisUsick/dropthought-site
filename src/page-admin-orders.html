@@ -1,0 +1,110 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="dt-order-list.html">
+<dom-module id="page-admin-orders">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .contentContainer {
+        @apply(--layout-vertical);
+      }
+
+      paper-tabs {
+        background-color: var(--paper-blue-500);
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+      }
+    </style>
+
+    <div class="contentContainer">
+      <paper-card heading="Orders">
+        <div class="card-content">
+          <paper-tabs selected="{{selectedTab}}">
+            <paper-tab>
+              New
+            </paper-tab>
+            <paper-tab>
+              Verified
+            </paper-tab>
+            <paper-tab>
+              Completed
+            </paper-tab>
+          </paper-tabs>
+          <iron-pages selected="{{selectedTab}}">
+            <div class="new">
+              New
+              <dt-order-list orders="{{newOrders}}"></dt-order-list>
+            </div>
+            <div class="verified">
+              Verified
+              <dt-order-list orders="{{verifiedOrders}}"></dt-order-list>
+            </div>
+            <div class="Completed">
+              Completed
+              <dt-order-list orders="{{completedOrders}}"></dt-order-list>
+            </div>
+          </iron-pages>
+        </div>
+      </paper-card>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-admin-orders',
+      properties: {
+        selectedTab: {
+          value: 0
+        }
+      },
+      ready: function() {
+        this.set('newOrders', [
+          {
+            product: {name: 'Tiny House on Wheels'}, status: 'new',
+            dateCreated: '2016-11-09T16:52:09.770Z',
+            customizations: [
+              {title: 'Customization 1', price: 51.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true},
+              {title: 'Customization 2', price: 62.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
+            ]
+          }
+        ]);
+
+        this.set('verifiedOrders', [
+          {
+            product: {name: 'Tiny House not on Wheels'}, status: 'verified',
+            dateCreated: '2016-11-09T16:52:09.770Z',
+            customizations: [
+              {title: 'Customization 1', price: 51.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true},
+              {title: 'Customization 2', price: 62.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
+            ]
+          }
+        ]);
+        this.set('completedOrders', [
+          {
+            product: {name: 'Tiny House with wings'}, status: 'completed',
+            dateCreated: '2016-11-09T16:52:09.770Z',
+            customizations: [
+              {title: 'Customization 1', price: 51.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true},
+              {title: 'Customization 2', price: 62.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
+            ]
+          }
+        ]);
+      }
+    });
+
+  </script>
+
+</dom-module>

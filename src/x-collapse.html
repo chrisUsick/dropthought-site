@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+
+<dom-module id="x-collapse">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .toggle {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-center);
+
+      }
+
+      .button {
+      }
+
+    </style>
+    <div class="contentContainer">
+      <div class="toggle" on-tap="toggleOpened">
+        <!-- <span>
+          {{heading}}
+        </span>
+        <span class="button">^</span> -->
+        <div>
+          <h3>{{heading}}</h3>
+        </div>
+        <div class="" hidden$="{{opened}}" >
+            <iron-icon icon="arrow-drop-down" prefix></iron-icon>
+        </div>
+        <div hidden$="{{!opened}}">
+            <iron-icon  icon="arrow-drop-up" prefix></iron-icon>
+        </div>
+      </div>
+      <iron-collapse opened="{{opened}}">
+        <content></content>
+      </iron-collapse>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'x-collapse',
+      properties: {
+        heading: {
+          type:String,
+          notify:false
+        },
+        opened: {
+          type:Boolean,
+          notify: true,
+          value: false
+        }
+      },
+      ready: function() {
+
+      },
+      toggleOpened: function() {
+        console.log('toggling');
+        this.set('opened', !this.opened);
+      }
+
+    });
+
+  </script>
+
+</dom-module>

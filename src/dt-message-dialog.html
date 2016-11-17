@@ -1,0 +1,88 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="dt-write-message.html">
+<dom-module id="dt-message-dialog">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+
+      }
+      .small {
+        /*@apply(--paper-font-subhead);*/
+        color: var(--paper-grey-500);
+        @apply(--paper-font-caption);
+      }
+
+
+      paper-dialog {
+        @apply(--layout-vertical);
+      }
+
+      paper-dialog-scrollable {
+        @apply(--layout-flex);
+        max-height: 300px;
+      }
+
+      .messages p {
+        margin:0;
+      }
+      </style>
+      <paper-dialog id="dialog">
+        <h2>{{message.from.displayName}} <span class="small">{{message.product.name}}</span></h2>
+        <paper-dialog-scrollable>
+          <div class="messages">
+            <template is="dom-repeat" items="{{messages}}">
+              <span class="small">
+                {{item.timestamp}}
+              </span>
+              <p>
+                {{item.content}}
+              </p>
+            </template>
+          </div>
+
+        </paper-dialog-scrollable>
+        <div>
+          <dt-write-message value="{{newMessageContent}}"></dt-write-message>
+        </div>
+        <div class="buttons">
+          <paper-button dialog-dismiss autofocus>Done</paper-button>
+        </div>
+      </paper-dialog>
+    </template>
+    <script>
+      Polymer({
+        is: 'dt-message-dialog',
+        properties: {
+          message: {
+            type: Object,
+            notify: true
+          }
+        },
+        ready: function () {
+          console.log(this.message);
+          this.set('messages', [
+            {
+              from: {displayName: 'Bob bob'}, content: 'elit. Nullam vulputate erat vitae lacus tristique c',
+              product: {name: 'Tiny House on Wheels'}, timestamp:'2016-11-09T16:52:09.770Z'
+            },{
+              from: {displayName: 'Bob bob'}, content: 'elit. Nullam vulputate erat vitae lacus tristique c',
+              product: {name: 'Tiny House on Wheels'}, timestamp:'2016-11-08T16:52:09.770Z'
+            },{
+              from: {displayName: 'Bob bob'}, content: 'elit. Nullam vulputate erat vitae lacus tristique c',
+              product: {name: 'Tiny House on Wheels'}, timestamp:'2016-11-07T16:52:09.770Z'
+            },
+          ])
+        },
+        open: function() {
+          this.$.dialog.open();
+        }
+      })
+    </script>

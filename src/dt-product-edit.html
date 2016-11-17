@@ -1,0 +1,71 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<dom-module id="dt-product-edit">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .contentContainer {
+        @apply(--layout-vertical);
+      }
+      
+      .customizations {
+        margin-left: 16px;
+      }
+
+      .delete-button {
+        background-color: var(--paper-red-a200);
+      }
+    </style>
+    <div class="contentContainer">
+      <paper-card heading="{{product.name}}">
+        <div class="card-content">
+          <paper-input label="Name" value="{{product.name}}"></paper-input>
+          <paper-textarea label="Description" value="{{product.description}}"></paper-textarea>
+          <paper-input label="Price" value="{{product.price}}" type="number">
+            <div prefix>$</div>
+          </paper-input>
+          <h3>Customizations</h3>
+          <div class="customizations">
+            <template is="dom-repeat" items="{{product.customizations}}">
+              <paper-input label="Title" value="{{item.title}}"></paper-input>
+              <paper-textarea label="Description" value="{{item.description}}"></paper-textarea>
+              <paper-input label="Price" value="{{item.price}}" type="number">
+                <div prefix>$</div>
+              </paper-input>
+              <paper-icon-button icon="delete" small class="delete-button"></paper-icon-button>
+              <hr>
+            </template>
+            <paper-button raised>Add Customization</paper-button>
+          </div>
+        </div>
+
+      </paper-card>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'dt-product-edit',
+      properties: {
+        product: {
+          type:Object,
+          notify: true
+        }
+      },
+      ready: function() {
+
+      }
+    })
+  </script>
+</dom-module>

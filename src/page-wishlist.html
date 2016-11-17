@@ -1,0 +1,62 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="dt-wishlist-item.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<dom-module id="page-wishlist">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        /*display: block;*/
+        padding: 10px;
+        /*@apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        @apply(--layout-center-justified);*/
+      }
+      .contentContainer {
+
+      }
+
+
+    </style>
+
+    <paper-card heading="Your wishlist">
+      <div class="card-content">
+        <template is="dom-repeat" items="{{products}}">
+          <dt-wishlist-item line-item="{{item}}"></dt-wishlist-item>
+        </template>
+      </div>
+    </paper-card>
+
+  </template>
+  <script>
+
+    Polymer({
+
+      is: 'page-wishlist',
+      properties: {
+        products: {
+          type: Array,
+          notify: true
+        }
+      },
+      ready: function() {
+        if (!this.products) {
+          this.set('products', [{
+            id: 1,
+            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+            customizations: [
+              {title: 'Customization 1', description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s'},
+              {title: 'Customization 2', description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
+            ]
+          }])
+        }
+
+      }
+    });
+  </script>
+</dom-module>
