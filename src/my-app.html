@@ -138,7 +138,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <a href="/admin">
               <paper-icon-button icon="social:person" class="align-right"></paper-icon-button>
             </a>
-            <paper-button on-tap="loginClicked">Login</paper-button>
+            <paper-button hidden$="[[isSignedIn]]" on-tap="loginClicked">Login</paper-button>
+            <paper-button hidden$="[[!isSignedIn]]" on-tap="logoutClicked">Logout</paper-button>
           </app-toolbar>
         </app-header>
 
@@ -166,7 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       last-error="{{authenticateError}}"
       handle-as="json"
       method="POST"
-      headers='{"Access-Control-Allow-Origin":"localhost:3000", "Access-Control-Allow-Headers": "*", "access-token":''}'
+      headers='{"Access-Control-Allow-Origin":"localhost:3000", "Access-Control-Allow-Headers": "access-token"}'
       on-response="onAuthenticateResponse"></iron-ajax>
   <iron-ajax
       id="products"
@@ -174,6 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       last-response="{{products}}"
       on-response="onProductsResponse"
       content-type="applicaiton-json"
+      headers="{{adminHeaders}}"
       handle-as="json"></iron-ajax>
   </template>
 
@@ -247,7 +249,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             scope: 'profile'
         }).then(function () {
           // Listen for sign-in state changes.
-          gapi.auth2.getAuthInstance().isSignedIn.listen(self.updateSigninStatus);
+          gapi.auth2.getAuthInstance().isSignedIn.listen(self.updateSigninStatus.bind(self));
 
           // Handle the initial sign-in state.
           self.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
@@ -258,8 +260,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // console.log('Logged in', isSignedIn);
           var response = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
           // console.log(response);
-          // this.$.authenticate.body = {token: response.id_token};
-          // this.$.authenticate.generateRequest();
+          this.$.authenticate.body = {token: response.id_token};
+          this.$.authenticate.generateRequest();
+          this.isSignedIn = true;
+        } else {
+          this.isSignedIn = false;
         }
       },
       loginClicked: function (event) {
@@ -268,10 +273,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       onAuthenticateResponse: function(ev, request) {
         headers = request.xhr.getAllResponseHeaders()
         console.log(ev, this.authenticateResponse, this.authenticateError, headers);
+        this.set('adminHeaders', this.authenticateResponse.token);
         this.$.products.generateRequest();
       },
       onProductsResponse: function(ev, request) {
         console.log(ev, this.products, arguments);
+      },
+      logoutClicked: function() {
+        gapi.auth2.getAuthInstance().signOut();
+        this.isSignedIn = false;
       }
 
 
