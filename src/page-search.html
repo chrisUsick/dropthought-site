@@ -130,28 +130,31 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         this.set('search', '');
       },
       ready: function() {
-        var products = [
-          {
-            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-            id: 1, tags: [1]
-          },{
-            name: 'Tiny house on wheels', description:'L ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-            id: 1, tags: [3]
-          },{
-            name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus f',
-            id: 1, tags: []
-          },
-        ];
-        tags = [{id: 1, name: 'gokart'}, {id: 2, name:'house'}, {id: 3, name:'Tiny House'}]
-        this.set('searchResult', {products: products, tags: tags});
-        this.onAjaxSearchResponse(null);
+        // var products = [
+        //   {
+        //     name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+        //     id: 1, tags: [1]
+        //   },{
+        //     name: 'Tiny house on wheels', description:'L ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
+        //     id: 1, tags: [3]
+        //   },{
+        //     name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus f',
+        //     id: 1, tags: []
+        //   },
+        // ];
+        // tags = [{id: 1, name: 'gokart'}, {id: 2, name:'house'}, {id: 3, name:'Tiny House'}]
+        // this.set('searchResult', {products: products, tags: tags});
+        // this.onAjaxSearchResponse(null);
       },
       _searchChanged: function() {
         console.log('search changed');
+        this.set('params', {keywords: this.search});
+        this.$.ajaxSearch.generateRequest();
       },
       onAjaxSearchResponse: function(ev) {
         this.products = this.searchResult.products;
-        this.tags = this.searchResult.tags;
+        this.tags = [{name:'none', id:-1}].concat(this.searchResult.tags);
+        console.log(this.products, this.tags);
       },
       _selectedTagIndexChanged: function() {
         var tag = this.tags[this.selectedTagIndex];
@@ -159,8 +162,10 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         this.$.productsRepeater.render();
       },
       filterProducts: function(product) {
-        if (this.selectedTag) {
-          return product.tags && product.tags.indexOf(this.selectedTag.id);
+        if (this.selectedTag && this.selectedTag.id != -1) {
+          return product.tags && !product.tags
+            .map(function(t){return t.id})
+            .indexOf(this.selectedTag.id);
         } else {
           return true;
         }
