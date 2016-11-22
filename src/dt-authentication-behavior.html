@@ -1,0 +1,80 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="dt-globals-behavior.html">
+
+<script>
+  var ajax = null;
+  var authenticationHeadersPromise = null;
+  var authenticationHeadersResolver = null;
+  var authenticationHeadersRejecter = null;
+  AuthenticationBehavior = {
+    _ajax: function() {
+      if (ajax) {
+        return ajax;
+      } else {
+        ajax = document.createElement('iron-ajax');
+        ajax.url = this.apiRoot() + '/auth/google';
+        ajax.set('method','POST');
+        ajax.handleAs = 'json';
+        ajax.contentType = 'application/json';
+        ajax.addEventListener('response', this.ajaxResponse.bind(this));
+        return ajax;
+      }
+    },
+    registered: function() {
+      //console.log(this);
+    },
+    ajaxResponse: function() {
+      console.log('authenticated from behavior', this._ajax().lastResponse);
+      // authenticationHeadersPromise = Promise.resolve(this._ajax().lastResponse.token);
+      if (authenticationHeadersResolver) {
+        authenticationHeadersResolver(this._ajax().lastResponse.token);
+      }
+    },
+    initClient: function() {
+        console.log('initClient');
+        var self = this;
+        gapi.client.init({
+            apiKey: 'AIzaSyAOkXTdDYF9zE_QHnAK9_1GE73Z0yweIQ4',
+            discoveryDocs: ["https://people.googleapis.com/$discovery/rest?version=v1"],
+            clientId: '232215442852-v9gtrr919f6bbc2grlqgfktiihaoutnm.apps.googleusercontent.com',
+            scope: 'profile'
+        }).then(function () {
+          // Listen for sign-in state changes.
+          gapi.auth2.getAuthInstance().isSignedIn.listen(self.updateSigninStatus.bind(self));
+
+          // Handle the initial sign-in state.
+          self.updateSigninStatus.bind(self)(gapi.auth2.getAuthInstance().isSignedIn.get());
+        });
+      },
+      updateSigninStatus: function(isSignedIn) {
+        if (isSignedIn) {
+          // console.log('Logged in', isSignedIn);
+          var response = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
+          // console.log(response);
+          this._ajax().body = {token: response.id_token};
+          this._ajax().generateRequest();
+          this.isSignedIn = true;
+        } else {
+          this.isSignedIn = false;
+        }
+      },
+      logout: function() {
+        gapi.auth2.getAuthInstance().signOut();
+      },
+      login: function() {
+        gapi.auth2.getAuthInstance().signIn();
+      },
+      getAuthenticationHeaders: function() {
+        if (authenticationHeadersPromise) {
+          return authenticationHeadersPromise;
+        } else {
+          authenticationHeadersPromise = new Promise(function(resolve, reject) {
+            authenticationHeadersResolver = resolve;
+            authenticationHeadersRejecter = reject;
+          });
+          this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          return authenticationHeadersPromise;
+        }
+      }
+  }
+</script>

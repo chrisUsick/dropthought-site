@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="dt-authentication-behavior.html">
 <dom-module id="my-app">
 
   <template>
@@ -132,10 +133,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </paper-input>
             <div class="add-space">
             </div>
-            <a href="/wishlist">
+            <a href="/wishlist" hidden$="[[!isSignedIn]]">
               <paper-icon-button icon="card-giftcard" class="align-right"></paper-icon-button>
             </a>
-            <a href="/admin">
+            <a href="/admin" hidden$="[[!isSignedIn]]">
               <paper-icon-button icon="social:person" class="align-right"></paper-icon-button>
             </a>
             <paper-button hidden$="[[isSignedIn]]" on-tap="loginClicked">Login</paper-button>
@@ -143,14 +144,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </app-toolbar>
         </app-header>
 
-        <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
+        <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
           <page-home name="home"></page-home>
           <page-search id="pageSearch" name="search" route="{{route}}" search="{{queryParams.search}}"></page-search>
           <page-plan name="plan" id="pagePlan" product-id="{{planRouteData.id}}"></page-plan>
           <page-wishlist name="wishlist" id="pageWishlist"></page-wishlist>
           <page-wishlist-customize name="wishlist-customize" id="pageWishlistCustomize"></page-wishlist-customize>
           <page-admin name="admin" id="pageAdmin"></page-admin>
-          <page-admin-product name="admin-product" id="pageAdminProduct" data="adminProductData"></page-admin-product>
+          <page-admin-product name="admin-product" id="pageAdminProduct" data="{{adminProductData}}"></page-admin-product>
           <page-admin-product-new name="admin-product-new" id="pageAdminProductNew"></page-admin-product-new>
           <page-admin-order name="admin-order" id="pageAdminOrder" data="adminOrderData"></page-admin-order>
           <page-admin-orders name="admin-orders" id="pageAdminOrders" data="adminOrdersData"></page-admin-orders>
@@ -159,16 +160,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       </app-header-layout>
 
-  <iron-ajax
-      id="authenticate"
-      url="http://localhost:3000/api/auth/google"
-      content-type="application/json"
-      last-response="{{authenticateResponse}}"
-      last-error="{{authenticateError}}"
-      handle-as="json"
-      method="POST"
-      headers='{"Access-Control-Allow-Origin":"localhost:3000", "Access-Control-Allow-Headers": "access-token"}'
-      on-response="onAuthenticateResponse"></iron-ajax>
+
   <iron-ajax
       id="products"
       url="http://localhost:3000/api/products"
@@ -199,8 +191,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         search: {
           type: String,
           notify: true
+        },
+        isSignedIn: {
+          type:Boolean,
+          value: false
         }
       },
+      behaviors: [AuthenticationBehavior, GlobalsBehavior],
 
       observers: [
         '_routePageChanged(routeData.page)',
@@ -228,6 +225,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Load page import on demand. Show 404 page if fails
         var resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
+        var pages = this.$.pages;
+        var page = pages.selectedItem;
+        if (page && page.viewed) {
+            page.viewed();
+        }
       },
 
       _showPage404: function() {
@@ -239,48 +241,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.set('route.path', '/search');
         }
       },
-      initClient: function() {
-        console.log('initClient');
-        var self = this;
-        gapi.client.init({
-            apiKey: 'AIzaSyAOkXTdDYF9zE_QHnAK9_1GE73Z0yweIQ4',
-            discoveryDocs: ["https://people.googleapis.com/$discovery/rest?version=v1"],
-            clientId: '232215442852-v9gtrr919f6bbc2grlqgfktiihaoutnm.apps.googleusercontent.com',
-            scope: 'profile'
-        }).then(function () {
-          // Listen for sign-in state changes.
-          gapi.auth2.getAuthInstance().isSignedIn.listen(self.updateSigninStatus.bind(self));
-
-          // Handle the initial sign-in state.
-          self.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-        });
-      },
-      updateSigninStatus: function(isSignedIn) {
-        if (isSignedIn) {
-          // console.log('Logged in', isSignedIn);
-          var response = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
-          // console.log(response);
-          this.$.authenticate.body = {token: response.id_token};
-          this.$.authenticate.generateRequest();
-          this.isSignedIn = true;
-        } else {
-          this.isSignedIn = false;
-        }
-      },
       loginClicked: function (event) {
-        gapi.auth2.getAuthInstance().signIn();
+        this.login();
       },
       onAuthenticateResponse: function(ev, request) {
         headers = request.xhr.getAllResponseHeaders()
-        console.log(ev, this.authenticateResponse, this.authenticateError, headers);
+        //console.log(ev, this.authenticateResponse, this.authenticateError, headers);
         this.set('adminHeaders', this.authenticateResponse.token);
         this.$.products.generateRequest();
       },
       onProductsResponse: function(ev, request) {
-        console.log(ev, this.products, arguments);
+        // console.log(ev, this.products, arguments);
       },
       logoutClicked: function() {
-        gapi.auth2.getAuthInstance().signOut();
+        this.logout();
         this.isSignedIn = false;
       }
 

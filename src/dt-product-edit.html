@@ -16,16 +16,20 @@
         padding: 10px;
       }
 
-      .contentContainer {
+      .contentContainer, .card-content{
         @apply(--layout-vertical);
       }
-      
+
       .customizations {
         margin-left: 16px;
       }
 
       .delete-button {
         background-color: var(--paper-red-a200);
+      }
+
+      .save-button {
+        @apply(--layout-self-end);
       }
     </style>
     <div class="contentContainer">
@@ -49,7 +53,11 @@
             </template>
             <paper-button raised>Add Customization</paper-button>
           </div>
+          <div class="save-button">
+            <paper-button class="save-button" raised on-tap="onSaveTapped">Save</paper-button>
+          </div>
         </div>
+
 
       </paper-card>
     </div>
@@ -60,11 +68,16 @@
       properties: {
         product: {
           type:Object,
-          notify: true
+          notify: true,
+          value: function() {return {}}
         }
       },
       ready: function() {
 
+      },
+      onSaveTapped: function() {
+        this.fire('save');
+        console.log('product-edit', this.product);
       }
     })
   </script>
