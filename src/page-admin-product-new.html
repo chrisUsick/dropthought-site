@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="dt-product-edit.html">
+<link rel="import" href="dt-ajax.html">
 <dom-module id="page-admin-product-new">
 
   <template>
@@ -21,16 +22,43 @@
 
     <div class="contentContainer">
 
-      <dt-product-edit product="{{product}}"></dt-product-edit>
+      <dt-product-edit product="{{product}}" on-save="onProductSaved"></dt-product-edit>
     </div>
 
+    <dt-ajax
+        id="ajaxProduct"
+        path="/products"
+        method="POST"
+        authenticate
+        body="{{productData}}"
+        last-response="{{productResponseData}}"
+        on-response="onProductResponse"></dt-ajax>
   </template>
 
   <script>
 
     Polymer({
 
-      is: 'page-admin-product-new'
+      is: 'page-admin-product-new',
+      properties: {
+        product: {
+          type: Object,
+          notify: true
+        }
+      },
+      ready: function() {
+
+      },
+      onProductSaved: function() {
+        console.log('saved');
+        this.productData = {product: this.product};
+        this.$.ajaxProduct.generateRequest();
+      },
+      onProductResponse: function() {
+        var product = this.productResponseData;
+        // window.history.pushState({}, 'Product', '/admin/product/' + product.id);
+        window.location = '/admin/product/' + product.id;
+      }
     });
 
   </script>

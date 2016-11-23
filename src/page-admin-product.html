@@ -7,6 +7,7 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="dt-product-edit.html">
+<link rel="import" href="dt-ajax.html">
 <dom-module id="page-admin-product">
 
   <template>
@@ -30,8 +31,23 @@
       }
     </style>
 
-    <dt-product-edit product="{{product}}"></dt-product-edit>
+    <dt-product-edit product="{{product}}" on-save="onSaved" on-delete="onDelete"></dt-product-edit>
 
+  <dt-ajax
+      id="ajaxProduct"
+      path="/products/{{productId}}"
+      last-response="{{product}}"></dt-ajax>
+  <dt-ajax
+      id="ajaxProductPost"
+      path="/products/{{productId}}"
+      body="{{product}}"
+      method="POST"
+      last-response="{{productUpdate}}"></dt-ajax>
+  <dt-ajax
+      id="ajaxProductDelete"
+      path="/products/{{productId}}"
+      method="DELETE"
+      last-response="{{productDeleteUpdate}}"></dt-ajax>
   </template>
 
   <script>
@@ -40,31 +56,26 @@
 
       is: 'page-admin-product',
       properties: {
-        product:Object
+        product:Object,
+        data: Object,
+        productId: Number
       },
       ready: function() {
-        this.set('product', {
-          name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-            images: [
-              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_1'},
-              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_2'},
-              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_3'},
-              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_4'},
-              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_5'},
-              {url: 'https://dummyimage.com/120x80/aaa/fff&text=img_6'}
-            ],
-            price: 135.66,
-            customizations: [
-              {
-                title: 'Customization 1', description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s'
-                , price: 16.34
-              },
-              {
-                title: 'Customization 2', description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s'
-                , price: 78.58
-              }
-            ]
-        })
+        this.viewed();
+      },
+      viewed: function() {
+        var id = this.data && this.data.id;
+        this.productId = id;
+        this.$.ajaxProduct.generateRequest();
+      },
+      onSaved: function() {
+
+        this.$.ajaxProductPost.generateRequest();
+      },
+      onDelete: function() {
+        console.log('deleting');
+        this.$.ajaxProductDelete.generateRequest();
+        window.location = '/admin'
       }
     });
 
