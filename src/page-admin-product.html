@@ -31,7 +31,7 @@
       }
     </style>
 
-    <dt-product-edit product="{{product}}" on-save="onSaved"></dt-product-edit>
+    <dt-product-edit product="{{product}}" on-save="onSaved" on-delete="onDelete"></dt-product-edit>
 
   <dt-ajax
       id="ajaxProduct"
@@ -43,6 +43,11 @@
       body="{{product}}"
       method="POST"
       last-response="{{productUpdate}}"></dt-ajax>
+  <dt-ajax
+      id="ajaxProductDelete"
+      path="/products/{{productId}}"
+      method="DELETE"
+      last-response="{{productDeleteUpdate}}"></dt-ajax>
   </template>
 
   <script>
@@ -66,6 +71,10 @@
       onSaved: function() {
 
         this.$.ajaxProductPost.generateRequest();
+      },
+      onDelete: function() {
+        console.log('deleting');
+        this.$.ajaxProductDelete.generateRequest();
       }
     });
 

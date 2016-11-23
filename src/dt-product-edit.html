@@ -6,6 +6,7 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <dom-module id="dt-product-edit">
 
   <template>
@@ -22,16 +23,33 @@
 
       .customizations {
         margin-left: 16px;
+        margin-bottom: 16px;
       }
 
       .delete-button {
         background-color: var(--paper-red-a200);
       }
 
-      .save-button {
+      .card-actions {
         @apply(--layout-self-end);
       }
+      #deleteButton {
+        background-color: var(--paper-red-a200);
+      }
     </style>
+    <paper-dialog
+        id="deleteDialog"
+        no-cancel-on-outside-click
+        no-cancel-on-esc-key
+        with-backdrop
+        on-iron-overlay-closed="onIronOverlayClosed"
+        on-iron-overlay-opened="onIronOverlayOpened">
+      <p>Are you sure you want to delete {{product.name}}?</p>
+      <div class="buttons">
+        <paper-button dialog-dismiss>No</paper-button>
+        <paper-button dialog-confirm autofocus>Yes</paper-button>
+      </div>
+    </paper-dialog>
     <div class="contentContainer">
       <paper-card heading="{{product.name}}">
         <div class="card-content">
@@ -53,14 +71,15 @@
             </template>
             <paper-button raised>Add Customization</paper-button>
           </div>
-          <div class="save-button">
+          <div class="card-actions">
+            <paper-button id="deleteButton" raised on-tap="onDeleteTapped">Delete</paper-button>
             <paper-button class="save-button" raised on-tap="onSaveTapped">Save</paper-button>
           </div>
         </div>
 
-
       </paper-card>
     </div>
+
   </template>
   <script>
     Polymer({
@@ -77,7 +96,17 @@
       },
       onSaveTapped: function() {
         this.fire('save');
-        console.log('product-edit', this.product);
+      },
+      onDeleteTapped: function() {
+        this.$.deleteDialog.open();
+      },
+      onIronOverlayClosed: function(ev) {
+        if (ev.detail.confirmed) {
+          this.fire('delete');
+        }
+      },
+      onIronOverlayOpened: function(ev) {
+        document.body.insertBefore(ev.target, document.body.firstChild);
       }
     })
   </script>

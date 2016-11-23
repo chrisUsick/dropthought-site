@@ -30,7 +30,9 @@
         path="/products"
         method="POST"
         authenticate
-        body="{{productData}}"></dt-ajax>
+        body="{{productData}}"
+        last-response="{{productResponseData}}"
+        on-response="onProductResponse"></dt-ajax>
   </template>
 
   <script>
@@ -51,6 +53,11 @@
         console.log('saved');
         this.productData = {product: this.product};
         this.$.ajaxProduct.generateRequest();
+      },
+      onProductResponse: function() {
+        var product = this.productResponseData;
+        // window.history.pushState({}, 'Product', '/admin/product/' + product.id);
+        window.location = '/admin/product/' + product.id;
       }
     });
 

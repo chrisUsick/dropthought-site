@@ -169,9 +169,11 @@
         }
       },
       ready: function() {
+        this.viewed();
+      },
+      viewed: function() {
         this.$.ajaxUserAll.generateRequest();
       },
-
       formatMessageContent: function(content) {
         var maxChars = 85;
         var ending = content.length > maxChars ? '...' : ''
