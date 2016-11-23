@@ -92,10 +92,12 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 
     </div>
     <paper-toast id="addToWishlistToast" duration="0" >
+      <span hidden$="[[addToWishlistError]]">Success</span>
       <span hidden$="[[!addToWishlistError]]">
-        Error: {{addToWishlistError.message}}
+        <span>Error: {{addToWishlistError.message}}</span>
         <paper-button hidden$="[[!addToWishlistError.notAuthenticated]]" on-tap="onToastLoginTapped" class="green-button">Login</paper-button>
       </span>
+      <paper-button on-tap="onToastCloseTapped">X</paper-button>
     </paper-toast>
 
   <iron-ajax
@@ -176,7 +178,7 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         this.addItemToWishlist(self.wishlistItemId)
           .then(function(){
             self.addToWishlistError = null;
-            self.addToWishlistToast.open();
+            self.$.addToWishlistToast.open();
             self.wishlistItemId = undefined;
           }.bind(self))
           .catch(function(error) {
@@ -191,6 +193,9 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
           .then(function() {
             self.addItemToWishlistHelper();
           });
+      },
+      onToastCloseTapped: function() {
+        this.$.addToWishlistToast.close();
       }
     });
 

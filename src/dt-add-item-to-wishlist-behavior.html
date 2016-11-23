@@ -8,8 +8,7 @@
         return {
           url: GlobalsBehavior.apiRoot() + '/users/current/wishlist',
           method: 'POST',
-          handleAs: 'json',
-          headers: {}
+          handleAs: 'json'
         }
       },
       addItemToWishlist: function(id) {
@@ -17,9 +16,15 @@
           console.log('adding item', id);
           var request = document.createElement('iron-request');
           var options = this._addItemToWishlistRequestOptions();
-          options.body = {id: id};
-          request.send(options);
-          return request.completes;
+          return AuthenticationBehavior.getAuthenticationHeaders()
+            .then(function(headers) {
+              options.headers = headers;
+              options.headers['Content-Type'] = 'application/json';
+              // options.body = {product:{id:id}};
+              options.body = {product_id:id};
+              request.send(options);
+              return request.completes;
+            })
         } else {
           return Promise.reject({notAuthenticated:true, message:'Must be logged in to use your wishlist.'});
         }

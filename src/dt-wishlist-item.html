@@ -17,7 +17,7 @@
       .contentContainer {
         @apply(--layout-horizontal);
         @apply(--layout-justified-start);
-        @apply(--layout-start);
+        @apply(--layout-center);
       }
 
       .contentContainer iron-image {
@@ -43,8 +43,10 @@
     <div class="contentContainer">
       <iron-image sizing="contain" src="https://dummyimage.com/120x120/aaa/fff&text=++"></iron-image>
       <h4>
-        <a href="/wishlist/{{lineItem.id}}/customize">{{lineItem.name}}</a>
+        <!-- <a href="/wishlist/{{lineItem.id}}/customize">{{lineItem.name}}</a> -->
+        {{lineItem.name}}
       </h4>
+      <paper-button raised>Order</paper-button>
       <div class="customizations">
         <template is="dom-repeat" items="{{lineItem.customizations}}">
           <div>
