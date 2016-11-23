@@ -21,6 +21,8 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="dt-add-item-to-wishlist-behavior.html">
 <dom-module id="page-search">
 
   <template>
@@ -61,6 +63,9 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
           margin: 2em;
         }
       }
+      .green-button {
+        color: var(--paper-green-500);
+      }
     </style>
 
     <div class="contentContainer">
@@ -79,13 +84,21 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
             </div>
             <div class="card-actions">
               <paper-button on-tap="learnMore" plan-id="[[item.id]]">Learn More</paper-button>
-              <paper-button>Purchase</paper-button>
+              <paper-button on-tap="onAddToWishlistTapped" product-id="[[item.id]]">Add to Wishlist</paper-button>
             </div>
           </paper-card>
         </template>
       </div>
 
     </div>
+    <paper-toast id="addToWishlistToast" duration="0" >
+      <span hidden$="[[addToWishlistError]]">Success</span>
+      <span hidden$="[[!addToWishlistError]]">
+        <span>Error: {{addToWishlistError.message}}</span>
+        <paper-button hidden$="[[!addToWishlistError.notAuthenticated]]" on-tap="onToastLoginTapped" class="green-button">Login</paper-button>
+      </span>
+      <paper-button on-tap="onToastCloseTapped">X</paper-button>
+    </paper-toast>
 
   <iron-ajax
       id="ajaxSearch"
@@ -125,26 +138,12 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
           notify: true
         }
       },
+      behaviors: [AuthenticationBehavior, AddItemToWishlistBevhavior],
       learnMore: function(e) {
         this.set('route.path', '/plan/' + e.target.planId);
         this.set('search', '');
       },
       ready: function() {
-        // var products = [
-        //   {
-        //     name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-        //     id: 1, tags: [1]
-        //   },{
-        //     name: 'Tiny house on wheels', description:'L ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed.',
-        //     id: 1, tags: [3]
-        //   },{
-        //     name: 'Tiny house on wheels', description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus finibus tincidunt nisi, at fringilla dolor porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi semper iaculis rutrum. Mauris facilisis odio a nisl auctor, rutrum elementum enim ullamcorper. Fusce vel velit fringilla, finibus lectus in, bibendum risus. Suspendisse diam diam, maximus dictum semper id, lobortis quis turpis. Mauris malesuada ultricies orci quis rutrum. Sed quis condimentum odio. Phasellus f',
-        //     id: 1, tags: []
-        //   },
-        // ];
-        // tags = [{id: 1, name: 'gokart'}, {id: 2, name:'house'}, {id: 3, name:'Tiny House'}]
-        // this.set('searchResult', {products: products, tags: tags});
-        // this.onAjaxSearchResponse(null);
       },
       _searchChanged: function() {
         console.log('search changed');
@@ -152,7 +151,7 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         this.$.ajaxSearch.generateRequest();
       },
       onAjaxSearchResponse: function(ev) {
-        this.products = this.searchResult.products;
+        this.products = this.searchResult && this.searchResult.products;
         this.tags = [{name:'none', id:-1}].concat(this.searchResult.tags);
         console.log(this.products, this.tags);
       },
@@ -169,6 +168,34 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         } else {
           return true;
         }
+      },
+      onAddToWishlistTapped: function(ev) {
+        this.wishlistItemId = ev.target.productId;
+        this.addItemToWishlistHelper();
+      },
+      addItemToWishlistHelper: function() {
+        var self = this;
+        this.addItemToWishlist(self.wishlistItemId)
+          .then(function(){
+            self.addToWishlistError = null;
+            self.$.addToWishlistToast.open();
+            self.wishlistItemId = undefined;
+          }.bind(self))
+          .catch(function(error) {
+            self.addToWishlistError = error;
+            self.$.addToWishlistToast.open();
+          }.bind(self));
+      },
+      onToastLoginTapped: function() {
+        this.$.addToWishlistToast.close();
+        var self = this;
+        this.login()
+          .then(function() {
+            self.addItemToWishlistHelper();
+          });
+      },
+      onToastCloseTapped: function() {
+        this.$.addToWishlistToast.close();
       }
     });
 

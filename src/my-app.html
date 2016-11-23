@@ -133,14 +133,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </paper-input>
             <div class="add-space">
             </div>
-            <a href="/wishlist" hidden$="[[!isSignedIn]]">
+            <a href="/wishlist" hidden$="[[!_isSignedIn]]">
               <paper-icon-button icon="card-giftcard" class="align-right"></paper-icon-button>
             </a>
-            <a href="/admin" hidden$="[[!isSignedIn]]">
+            <a href="/admin" hidden$="[[!_isSignedIn]]">
               <paper-icon-button icon="social:person" class="align-right"></paper-icon-button>
             </a>
-            <paper-button hidden$="[[isSignedIn]]" on-tap="loginClicked">Login</paper-button>
-            <paper-button hidden$="[[!isSignedIn]]" on-tap="logoutClicked">Logout</paper-button>
+            <paper-button hidden$="[[_isSignedIn]]" on-tap="loginClicked">Login</paper-button>
+            <paper-button hidden$="[[!_isSignedIn]]" on-tap="logoutClicked">Logout</paper-button>
           </app-toolbar>
         </app-header>
 
@@ -192,7 +192,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           notify: true
         },
-        isSignedIn: {
+        _isSignedIn: {
           type:Boolean,
           value: false
         }
@@ -255,7 +255,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       logoutClicked: function() {
         this.logout();
-        this.isSignedIn = false;
+        this._isSignedIn = false;
+        this.set('route.path', '/');
       }
 
 

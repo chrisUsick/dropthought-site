@@ -1,0 +1,33 @@
+<link rel="import" href="dt-authentication-behavior.html">
+<link rel="import" href="dt-globals-behavior.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-request.html">
+<script>
+    var ajax = null;
+    AddItemToWishlistBevhavior = {
+      _addItemToWishlistRequestOptions: function() {
+        return {
+          url: GlobalsBehavior.apiRoot() + '/users/current/wishlist',
+          method: 'POST',
+          handleAs: 'json'
+        }
+      },
+      addItemToWishlist: function(id) {
+        if (AuthenticationBehavior.isSignedIn()) {
+          console.log('adding item', id);
+          var request = document.createElement('iron-request');
+          var options = this._addItemToWishlistRequestOptions();
+          return AuthenticationBehavior.getAuthenticationHeaders()
+            .then(function(headers) {
+              options.headers = headers;
+              options.headers['Content-Type'] = 'application/json';
+              // options.body = {product:{id:id}};
+              options.body = {product_id:id};
+              request.send(options);
+              return request.completes;
+            })
+        } else {
+          return Promise.reject({notAuthenticated:true, message:'Must be logged in to use your wishlist.'});
+        }
+      }
+    }
+</script>
