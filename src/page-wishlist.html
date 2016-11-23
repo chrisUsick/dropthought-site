@@ -5,8 +5,11 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="dt-ajax.html">
+<link rel="import" href="dt-customization-edit.html">
 
 <dom-module id="page-wishlist">
 
@@ -24,7 +27,24 @@
 
       }
 
+      .wishlist-product {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified-start);
+        @apply(--layout-center);
+      }
+      .wishlist-product iron-image {
+        width: 48px;
+        height: 48px;
+        margin:0 0.6em;
+      }
 
+      .wishlist-product h4 {
+        margin: 0px;
+      }
+
+      .customization {
+        margin-left: 1em;
+      }
     </style>
 
     <paper-card heading="Your wishlist">
@@ -44,7 +64,14 @@
             <div class="new">
               Wishlist
               <template is="dom-repeat" items="{{wishlistProducts}}">
-                <dt-wishlist-item line-item="{{item}}"></dt-wishlist-item>
+                <div class="wishlist-product">
+                  <iron-image sizing="contain" src="https://dummyimage.com/120x120/aaa/fff&text=++"></iron-image>
+                  <h4>
+                    {{item.name}}
+                  </h4>
+                  <paper-button raised product="[[item]]" on-tap="onWishlistProductOrderTapped">Order</paper-button>
+                </div>
+
               </template>
             </div>
             <div class="verified">
@@ -57,11 +84,31 @@
       </div>
     </paper-card>
 
+    <paper-dialog id="orderDialog">
+      <h3>Order {{productToOrder.name}}</h3>
+      <h4>Customizations</h4>
+      <template is="dom-repeat" items="{{productToOrder.customizations}}">
+        <div class="customization">
+          <dt-customization-edit customization="{{item}}"></dt-customization-edit>
+        </div>
+      </template>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus on-tap="onOrderConfirmTapped">Confirm</paper-button>
+      </div>
+    </paper-dialog>
+
     <dt-ajax
         id="ajaxProducts"
         path='/users/current/wishlist'
         authenticate
         last-response="{{wishlistProducts}}"></dt-ajax>
+    <dt-ajax
+        id="ajaxOrder"
+        path='/orders'
+        method='POST'
+        authenticate
+        last-response="{{orderResponse}}"></dt-ajax>
   </template>
   <script>
 
@@ -83,6 +130,17 @@
       },
       viewed: function() {
         this.$.ajaxProducts.generateRequest();
+      },
+      onWishlistProductOrderTapped: function(ev) {
+        console.log('order', ev.target.productId);
+        this.set('productToOrder', ev.target.product);
+        this.$.orderDialog.open();
+      },
+      onOrderConfirmTapped: function(ev){
+        var product = this.productToOrder;
+        var customizations = this.productToOrder.customizations;
+        this.set('orderBody', {product: product, customizations: customizations});
+        this.$.ajaxOrder.generateRequest();
       }
     });
   </script>

@@ -1,4 +1,4 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+ <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
@@ -17,12 +17,14 @@
       }
     </style>
     <div>
-      <h4>{{customization.title}}</h4>
-      <span>{{customization.description}}</span>
-    </div>
-    <span>Price: ${{customization.price}}</span>
-    <div>
-      <paper-checkbox checked="{{customization.selected}}">Add Customization</paper-checkbox>
+      <div>
+        <h4>{{customization.title}}</h4>
+        <span>{{customization.description}}</span>
+      </div>
+      <span>Price: ${{customization.price}}</span>
+      <div>
+        <paper-checkbox checked="{{customization.selected}}">Add Customization</paper-checkbox>
+      </div>
     </div>
   </template>
   <script>
