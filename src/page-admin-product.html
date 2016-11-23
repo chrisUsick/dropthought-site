@@ -75,6 +75,7 @@
       onDelete: function() {
         console.log('deleting');
         this.$.ajaxProductDelete.generateRequest();
+        window.location = '/admin'
       }
     });
 
