@@ -6,13 +6,15 @@
   var authenticationHeadersPromise = null;
   var authenticationHeadersResolver = null;
   var authenticationHeadersRejecter = null;
+  var loginResolver = null;
+  var loginRejecter = null;
   AuthenticationBehavior = {
     _ajax: function() {
       if (ajax) {
         return ajax;
       } else {
         ajax = document.createElement('iron-ajax');
-        ajax.url = this.apiRoot() + '/auth/google';
+        ajax.url = GlobalsBehavior.apiRoot() + '/auth/google';
         ajax.set('method','POST');
         ajax.handleAs = 'json';
         ajax.contentType = 'application/json';
@@ -54,8 +56,10 @@
           this._ajax().body = {token: response.id_token};
           this._ajax().generateRequest();
           this.isSignedIn = true;
+          loginResolver && loginResolver();
         } else {
           this.isSignedIn = false;
+          loginRejecter && loginRejecter();
         }
       },
       logout: function() {
@@ -63,6 +67,10 @@
       },
       login: function() {
         gapi.auth2.getAuthInstance().signIn();
+        return new Promise(function(resolve, reject) {
+          loginResolver = resolve;
+          loginRejecter = reject;
+        })
       },
       getAuthenticationHeaders: function() {
         if (authenticationHeadersPromise) {
@@ -75,6 +83,9 @@
           this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           return authenticationHeadersPromise;
         }
+      },
+      isSignedIn: function() {
+        return gapi.auth2 && gapi.auth2.getAuthInstance().isSignedIn.get();
       }
   }
 </script>
