@@ -45,6 +45,9 @@
       .customization {
         margin-left: 1em;
       }
+      .small {
+
+      }
     </style>
 
     <paper-card heading="Your wishlist">
@@ -76,9 +79,15 @@
             </div>
             <div class="verified">
               Orders
+              <template is="dom-repeat" items="{{notCompleteOrders}}">
+                <h3>{{item.product.name}} <span class="small">{{item.status}}</span></h3>
+              </template>
             </div>
             <div class="Completed">
               Completed
+              <template is="dom-repeat" items="{{completeOrders}}">
+                <h3>{{item.product.name}} <span class="small">{{item.status}}</span></h3>
+              </template>
             </div>
           </iron-pages>
       </div>
@@ -108,7 +117,15 @@
         path='/orders'
         method='POST'
         authenticate
-        last-response="{{orderResponse}}"></dt-ajax>
+        body="{{orderBody}}"
+        on-response="onOrderResponse"></dt-ajax>
+
+    <dt-ajax
+        id="ajaxOrders"
+        path='/users/current/orders'
+        authenticate
+        last-response="{{ordersResponse}}"
+        on-response="onOrdersResponse"></dt-ajax>
   </template>
   <script>
 
@@ -130,6 +147,7 @@
       },
       viewed: function() {
         this.$.ajaxProducts.generateRequest();
+        this.$.ajaxOrders.generateRequest();
       },
       onWishlistProductOrderTapped: function(ev) {
         console.log('order', ev.target.productId);
@@ -141,7 +159,23 @@
         var customizations = this.productToOrder.customizations;
         this.set('orderBody', {product: product, customizations: customizations});
         this.$.ajaxOrder.generateRequest();
+      },
+      onOrdersResponse: function() {
+        this.set('notCompleteOrders', []);
+        this.set('completeOrders', []);
+        var self = this;
+        this.ordersResponse.forEach(function(order) {
+          if (order.status == 'complete') {
+            self.push('completeOrders', order);
+          } else {
+            self.push('notCompleteOrders', order);
+          }
+        })
+      },
+      onOrderResponse: function() {
+        this.viewed();
       }
     });
   </script>
 </dom-module>
+le>
