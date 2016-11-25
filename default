@@ -1,0 +1,43 @@
+server {
+    root /var/www;
+    index index.html index.htm;
+
+    # Make site accessible from http://localhost/
+    server_name localhost;
+
+    # Add 1 day expires header for static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires 1d;
+    }
+
+
+    location /api/ {
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_pass http://web:3000/;
+      proxy_redirect http://$proxy_host:3000 http://$host:80;
+    }
+
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to redirecting to index.html
+        try_files $uri $uri/ @root;
+    }
+
+    # If nginx can't find a file, fallback to the homepage.
+    location @root {
+        rewrite .* / redirect;
+    }
+
+    include /etc/nginx/basic.conf;
+
+}
+
+server {
+  listen 3000;
+  location / {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_pass http://web:3000;
+  }
+}
