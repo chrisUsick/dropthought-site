@@ -121,7 +121,7 @@
           </div>
           <div class="orders" hidden$="{{!user.orders}}">
             <h1><a href="/admin/orders">New Orders</a></h1>
-            <template is="dom-repeat" items="{{orders}}">
+            <template is="dom-repeat" items="{{user.orders}}">
               <paper-item>
                 <paper-item-body>
                   <div class="">
