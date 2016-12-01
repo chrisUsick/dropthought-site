@@ -13,6 +13,7 @@
         on-response="onAjaxResponse"
         on-error="onAjaxError"
         method="[[method]]"
+        params="[[params]]"
         body="{{body}}"></iron-ajax>
     <!-- <iron-ajax
       id="ajaxSearch"
@@ -45,6 +46,10 @@
         body: {
           type: Object,
           notify: true
+        },
+        params: {
+          type:Object,
+          notify:true
         }
       },
       behaviors: [GlobalsBehavior, AuthenticationBehavior],

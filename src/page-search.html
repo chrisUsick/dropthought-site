@@ -23,6 +23,7 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="dt-add-item-to-wishlist-behavior.html">
+<link rel="import" href="dt-ajax.html">
 <dom-module id="page-search">
 
   <template>
@@ -100,14 +101,22 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
       <paper-button on-tap="onToastCloseTapped">X</paper-button>
     </paper-toast>
 
-  <iron-ajax
+  <!-- <iron-ajax
       id="ajaxSearch"
       url="http://localhost:3000/api/products/search"
       params="{{params}}"
       last-response="{{searchResult}}"
       handle-as="json"
-      on-response="onAjaxSearchResponse"></iron-ajax>
+      on-response="onAjaxSearchResponse"></iron-ajax> -->
+  <dt-ajax
+      id="ajaxSearch"
+      path="/products/search"
+      last-response="{{searchResult}}"
+      params="{{params}}"
+      on-response="onAjaxSearchResponse"></dt-ajax>
   </template>
+
+
 
   <script>
 
