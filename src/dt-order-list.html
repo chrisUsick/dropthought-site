@@ -39,17 +39,17 @@
         </div>
         <div class="card-content">
           <ul>
-            <template is="dom-repeat" items="{{item.customizations}}" as="customization">
+            <template is="dom-repeat" items="{{item.customization_prices}}" as="customization">
                 <li>
-                  <span>{{customization.title}}</span>
+                  <span>{{customization.customization.name}} - ${{customization.price}}</span>
                 </li>
             </template>
           </ul>
         </div>
         <div class="card-actions">
-          <paper-button hidden$="[[_hideStatusNew(item.status)]]">Reject</paper-button>
-          <paper-button hidden$="[[_hideStatusNew(item.status)]]">Verify</paper-button>
-          <paper-button hidden$="[[_hideStatusVerified(item.status)]]">Finish</paper-button>
+          <paper-button hidden$="[[_hideStatusNew(item.status)]]" data-order-index="[[index]]" id="reject" on-tap="triggerAction">Reject</paper-button>
+          <paper-button hidden$="[[_hideStatusNew(item.status)]]" data-order-index="[[index]]" id="verified" on-tap="triggerAction">Verify</paper-button>
+          <paper-button hidden$="[[_hideStatusVerified(item.status)]]" data-order-index="[[index]]" id="finished" on-tap="triggerAction">Finish</paper-button>
         </div>
       </paper-card>
     </template>
@@ -77,6 +77,10 @@
       },
       ready: function() {
 
+      },
+      triggerAction: function(ev) {
+        console.log('triggered', ev.target.id);
+        this.fire('order-' + ev.target.id, ev.target.dataOrderIndex);
       }
     })
   </script>

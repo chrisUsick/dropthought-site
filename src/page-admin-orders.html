@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="dt-ajax.html">
 
 <link rel="import" href="dt-order-list.html">
 <dom-module id="page-admin-orders">
@@ -44,20 +45,41 @@
           <iron-pages selected="{{selectedTab}}">
             <div class="new">
               New
-              <dt-order-list orders="{{newOrders}}"></dt-order-list>
+              <dt-order-list orders="{{newOrders}}"
+                             on-order-verified="onOrderVerified"
+                             on-order-rejected="onOrderRejected"></dt-order-list>
             </div>
             <div class="verified">
               Verified
-              <dt-order-list orders="{{verifiedOrders}}"></dt-order-list>
+              <dt-order-list orders="{{verifiedOrders}}"
+                              on-order-finished="onOrderFinished"></dt-order-list>
             </div>
             <div class="Completed">
               Completed
-              <dt-order-list orders="{{completedOrders}}"></dt-order-list>
+              <dt-order-list orders="{{completeOrders}}"></dt-order-list>
             </div>
           </iron-pages>
         </div>
       </paper-card>
     </div>
+
+    <dt-ajax
+      id="ajaxOrders"
+      path="/users/current/orders_to_fulfil"
+      last-response="{{orders}}"
+      on-response="onOrdersResponse"
+      authenticate
+      on-error="onOrdersError"></dt-ajax>
+
+    <dt-ajax
+      id="ajaxUpdateOrder"
+      path="/orders/update"
+      last-response="{{updatedOrder}}"
+      on-response="onUpdateOrderResponse"
+      authenticate
+      body="{{updateOrderBody}}"
+      method="POST"
+      on-error="onUpdateOrderError"></dt-ajax>
 
   </template>
 
@@ -69,40 +91,62 @@
       properties: {
         selectedTab: {
           value: 0
+        },
+        newOrders: {
+          type: Object,
+          value: function() {return []}
+        },
+        verifiedOrders: {
+          type: Object,
+          value: function() {return []}
+        },
+        completeOrders: {
+          type: Object,
+          value: function() {return []}
         }
       },
       ready: function() {
-        this.set('newOrders', [
-          {
-            product: {name: 'Tiny House on Wheels'}, status: 'new',
-            dateCreated: '2016-11-09T16:52:09.770Z',
-            customizations: [
-              {title: 'Customization 1', price: 51.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true},
-              {title: 'Customization 2', price: 62.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
-            ]
-          }
-        ]);
-
-        this.set('verifiedOrders', [
-          {
-            product: {name: 'Tiny House not on Wheels'}, status: 'verified',
-            dateCreated: '2016-11-09T16:52:09.770Z',
-            customizations: [
-              {title: 'Customization 1', price: 51.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true},
-              {title: 'Customization 2', price: 62.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
-            ]
-          }
-        ]);
-        this.set('completedOrders', [
-          {
-            product: {name: 'Tiny House with wings'}, status: 'completed',
-            dateCreated: '2016-11-09T16:52:09.770Z',
-            customizations: [
-              {title: 'Customization 1', price: 51.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true},
-              {title: 'Customization 2', price: 62.00, description: 'Nullam vulputate erat vitae lacus tristique cursus. In hac habitasse platea dictumst. Morbi s', selected: true}
-            ]
-          }
-        ]);
+        this.viewed();
+      },
+      viewed: function() {
+        this.$.ajaxOrders.generateRequest();
+      },
+      onOrdersResponse: function() {
+        var self = this;
+        this.orders.forEach(function(order) {
+          self.placeOrder(order);
+        })
+      },
+      placeOrder: function(order) {
+          this.push(order.status + 'Orders', order);
+      },
+      onOrderVerified: function(ev) {
+        console.log('verified', ev.detail);
+        var order = this.newOrders[ev.detail];
+        this.updateOrderBody = {id: order.id, status: 'verified'};
+        this.$.ajaxUpdateOrder.generateRequest();
+        this.removeOrder('newOrders', ev.detail);
+      },
+      onOrderRejected: function(ev) {
+        console.log('rejected');
+        var order = this.newOrders[ev.detail];
+        this.updateOrderBody = {id: order.id, status: 'rejected'};
+        this.$.ajaxUpdateOrder.generateRequest();
+        this.removeOrder('newOrders', ev.detail);
+      },
+      onOrderFinished: function(ev) {
+        console.log('finished', ev.detail);
+        var order = this.verifiedOrders[ev.detail];
+        this.updateOrderBody = {id: order.id, status: 'complete'};
+        this.$.ajaxUpdateOrder.generateRequest();
+        this.removeOrder('verifiedOrders', ev.detail);
+      },
+      onUpdateOrderResponse: function(ev) {
+        // set update the ui with the new order
+        this.placeOrder(this.updatedOrder);
+      },
+      removeOrder: function(orderType, index) {
+        this.splice(orderType, index, 1);
       }
     });
 

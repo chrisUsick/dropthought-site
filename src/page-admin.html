@@ -106,32 +106,26 @@
           </div>
           <div class="messages" hidden$="{{!user.messages}}">
             <h1>Messages</h1>
-            <paper-listbox>
-              <template is="dom-repeat" items="{{messages}}">
-                <paper-item on-tap="messageTapped">
-                  <paper-item-body two-line>
-                    <div>{{item.from.displayName}}<span class="small">{{item.product.name}}</span></div>
-                    <div secondary>[[formatMessageContent(item.content)]]</div>
-                  </paper-item-body>
-                  <dt-message-dialog id="messageDialog" message="{{item}}"></dt-message-dialog>
-                </paper-item>
-              </template>
-            </paper-listbox>
+            <template is="dom-repeat" items="{{messages}}">
+              <paper-item on-tap="messageTapped">
+                <paper-item-body two-line>
+                  <div>{{item.from.displayName}}<span class="small">{{item.product.name}}</span></div>
+                  <div secondary>[[formatMessageContent(item.content)]]</div>
+                </paper-item-body>
+                <dt-message-dialog id="messageDialog" message="{{item}}"></dt-message-dialog>
+              </paper-item>
+            </template>
 
           </div>
           <div class="orders" hidden$="{{!user.orders}}">
             <h1><a href="/admin/orders">New Orders</a></h1>
             <template is="dom-repeat" items="{{user.orders}}">
-              <paper-item>
-                <paper-item-body>
                   <div class="">
                     {{item.product.name}}
                   </div>
-                  <div secondary>
-                    {{item.dateCreated}}
+                  <div class="small">
+                    [[_formatCreatedAt(item.created_at)]]
                   </div>
-                </paper-item-body>
-              </paper-item>
             </template>
           </div>
         </div>
@@ -189,6 +183,9 @@
       },
       onUserAllError: function() {
         console.log('user all error');
+      },
+      _formatCreatedAt: function(date) {
+        return new Date(date).toDateString();
       }
 
     });
