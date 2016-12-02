@@ -5,10 +5,16 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/gold-cc-input/gold-cc-input.html">
+<link rel="import" href="../bower_components/gold-cc-cvc-input/gold-cc-cvc-input.html">
+<link rel="import" href="../bower_components/gold-cc-expiration-input/gold-cc-expiration-input.html">
+
 <link rel="import" href="dt-ajax.html">
+<link rel="import" href="dt-format-price-behavior.html">
 <link rel="import" href="dt-customization-edit.html">
 
 <dom-module id="page-wishlist">
@@ -107,6 +113,21 @@
       </div>
     </paper-dialog>
 
+    <paper-dialog id="ccDialog">
+      <h3>Purchase total: ${{_formatPrice(totalPrice)}}</h3>
+      <gold-cc-input value="{{ccNumber}}"></gold-cc-input>
+      <gold-cc-cvc-input value="{{ccCvc}}"></gold-cc-cvc-input>
+      <gold-cc-expiration-input value="{{ccExp}}"></gold-cc-expiration-input>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus on-tap="onPurchaseConfirmTapped">Confirm</paper-button>
+      </div>
+    </paper-dialog>
+    <paper-toast id="paymentToast" duration="0" >
+      <span>{{paymentStatus}}</span>
+      <paper-button hidden$="[[!showPaymentToastClose]]" on-tap="onClosePaymentToastTapped">Close</paper-button>
+    </paper-toast>
+
     <dt-ajax
         id="ajaxProducts"
         path='/users/current/wishlist'
@@ -140,8 +161,13 @@
         selectedTab: {
           type: Number,
           value: 0
+        },
+        totalPrice: {
+          type: Number,
+          computed: 'computeTotalPrice(productToOrder.customizations.*)'
         }
       },
+      behaviors: [FormatPriceBehavior],
       ready: function() {
         this.viewed();
       },
@@ -157,8 +183,9 @@
       onOrderConfirmTapped: function(ev){
         var product = this.productToOrder;
         var customizations = this.productToOrder.customizations;
-        this.set('orderBody', {product: product, customizations: customizations});
-        this.$.ajaxOrder.generateRequest();
+        // this.set('orderBody', {product: product, customizations: customizations});
+        // this.$.ajaxOrder.generateRequest();
+        this.$.ccDialog.open();
       },
       onOrdersResponse: function() {
         this.set('notCompleteOrders', []);
@@ -173,7 +200,54 @@
         })
       },
       onOrderResponse: function() {
+        this.paymentStatus = 'Complete!';
+        this.showPaymentToastClose = true;
         this.viewed();
+      },
+      onPurchaseConfirmTapped: function() {
+        var expMonth = this.ccExp.split('/')[0];
+        var expYear = this.ccExp.split('/')[1];
+        Stripe.card.createToken({
+            number: this.ccNumber,
+            cvc: this.ccCvc,
+            exp_month: expMonth,
+            exp_year: expYear
+          }, this.onStripeResponse.bind(this));
+        this.paymentStatus = 'Validating';
+        this.$.paymentToast.show();
+        console.log('purchased');
+      },
+      onStripeResponse: function(status, response) {
+        if (response.error) {
+          console.log('error');
+        } else {
+          var token = response.id;
+          console.log('got token:', token);
+          var product = this.productToOrder;
+          var customizations = this.productToOrder.customizations;
+          this.set('orderBody', {
+            product: product,
+            customizations: customizations,
+            token: token
+          });
+          this.paymentStatus = 'Processing';
+          this.$.ajaxOrder.generateRequest();
+        }
+      },
+      onClosePaymentToastTapped: function() {
+          this.$.paymentToast.close();
+      },
+      computeTotalPrice: function() {
+        var productToOrder = this.productToOrder;
+        var price = productToOrder.price;
+        if (productToOrder.customizations) {
+          productToOrder.customizations.forEach(function(c) {
+            if (c.selected) {
+              price += c.price;
+            }
+          })
+        }
+        return price;
       }
     });
   </script>

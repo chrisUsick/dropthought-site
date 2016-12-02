@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="dt-format-price-behavior.html">
 <dom-module id="dt-customization-edit">
 
   <template>
@@ -21,7 +22,7 @@
         <h4>{{customization.title}}</h4>
         <span>{{customization.description}}</span>
       </div>
-      <span>Price: ${{customization.price}}</span>
+      <span>Price: ${{_formatPrice(customization.price)}}</span>
       <div>
         <paper-checkbox checked="{{customization.selected}}">Add Customization</paper-checkbox>
       </div>
@@ -36,6 +37,7 @@
           notify: true
         }
       },
+      behaviors: [FormatPriceBehavior],
       ready: function() {
         console.log(this);
       }
