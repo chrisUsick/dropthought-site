@@ -36,6 +36,10 @@
       #deleteButton {
         background-color: var(--paper-red-a200);
       }
+      .tag {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+      }
     </style>
     <paper-dialog
         id="deleteDialog"
@@ -58,6 +62,20 @@
           <paper-input label="Price" value="{{product.price}}" type="number">
             <div prefix>$</div>
           </paper-input>
+          <h3>Tags</h3>
+          <div class="tags">
+            <template is="dom-repeat" items="{{product.tags}}" id="tagsRepeater">
+              <div hidden$="{{item._destroy}}">
+                <div class="tag" >
+                  <paper-input label="Name" value="{{item.name}}" type="text"></paper-input>
+                  <paper-input label="Slug" value="{{item.slug}}" type="text"></paper-input>
+                  <paper-icon-button icon="remove" tag={{item}} tag-index="{{index}}" on-tap="onTagRemoveTapped"></paper-icon-button>
+                </div>  
+              </div>
+
+            </template>
+            <paper-icon-button icon="add" small class="add-tag-button" on-tap="onAddTagTapped"></paper-icon-button>
+          </div>
           <h3>Customizations</h3>
           <div class="customizations">
             <template is="dom-repeat" items="{{product.customizations}}">
@@ -107,6 +125,17 @@
       },
       onIronOverlayOpened: function(ev) {
         document.body.insertBefore(ev.target, document.body.firstChild);
+      },
+      onAddTagTapped: function() {
+        console.log('add tag');
+        this.push('product.tags', {name: '', slug: ''});
+      },
+      onTagRemoveTapped: function(ev) {
+        console.log('remove tag', ev.target.tag, ev.target.tagIndex);
+        this.product.tags[ev.target.tag]
+        this.set('product.tags.' + ev.target.tagIndex + '._destroy', true);
+        this.$.tagsRepeater.render();
+        console.log('updated', this.product.tags[ev.target.tagIndex]);
       }
     })
   </script>
