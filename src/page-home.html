@@ -15,6 +15,8 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="dt-product-card.html">
+<link rel="import" href="dt-ajax.html">
 <dom-module id="page-home">
 
   <template>
@@ -45,19 +47,36 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
       header > p {
         font-size: 32px;
       }
+
+      .products {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        @apply(--layout-center-justified);
+      }
+
     </style>
 
     <div class="contentContainer">
       <header>
-        <h2>Main message</h2>
+        <h2>Drop Thought</h2>
         <p>
-          subtitle
-          <paper-icon-button icon="print"></paper-icon-button>
-          <iron-icon prefix></iron-icon>
         </p>
-
       </header>
+      <div class="products">
+        <template is="dom-repeat" items="{{products}}">
+          <dt-product-card product="{{item}}">
+            <div class="card-actions">
+              <paper-button><a class="no-style" href="/plan/{{item.id}}">Learn More</a></paper-button>
+            </div>
+          </dt-product-card>
+        </template>
+      </div>
     </div>
+
+    <dt-ajax
+        id="ajaxProducts"
+        path="/products/popular"
+        last-response="{{products}}"></dt-ajax>
 
   </template>
 
@@ -65,7 +84,10 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 
     Polymer({
 
-      is: 'page-home'
+      is: 'page-home',
+      ready: function() {
+        this.$.ajaxProducts.generateRequest();
+      }
 
     });
 

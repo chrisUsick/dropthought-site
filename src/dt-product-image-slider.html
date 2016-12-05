@@ -2,7 +2,7 @@
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 
-<dom-module id="plan-image-slider">
+<dom-module id="dt-product-image-slider">
 
   <template>
 
@@ -39,7 +39,7 @@
 
     Polymer({
 
-      is: 'plan-image-slider',
+      is: 'dt-product-image-slider',
       properties: {
         images: {
           type: Array,
@@ -53,7 +53,7 @@
         var self = this;
         setTimeout(function(){console.log(self.images)}, 100);
         this.async(function(){
-          if (self.images.length > 5) {
+          if (self.images && self.images.length > 5) {
             self.set('images', self.images.slice(0, 5));
           }
         }, 10);

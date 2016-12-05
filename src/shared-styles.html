@@ -49,6 +49,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: var(--paper-grey-500);
         @apply(--paper-font-caption);
       }
+
+      dt-product-card {
+        display:block;
+        @apply(--layout-flex-1);
+        @apply(--layout-self-start);
+        margin: 1em;
+      }
+
+      @media all and (min-width: 480px) and (max-width: 1920px) {
+        dt-product-card {
+          max-width: 350px;
+          margin: 2em;
+        }
+      }
+
+      a.no-style {
+        text-decoration: none;
+        color: inherit;
+      }
     </style>
   </template>
 </dom-module>

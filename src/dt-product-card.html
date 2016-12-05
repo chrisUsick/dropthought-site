@@ -1,0 +1,36 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="dt-format-price-behavior.html">
+<dom-module id="dt-product-card">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        /*padding: 10px;*/
+      }
+    </style>
+    <paper-card heading="{{product.name}}" image="https://dummyimage.com/640x480/aaa/fff&text=blah">
+      <div class="card-content">
+        {{product.description}}
+      </div>
+      <content></content>
+    </paper-card>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'dt-product-card',
+      properties: {
+        product: {
+          type: Object,
+          notify: true
+        }
+      },
+      ready: function() {
+        console.log('product card');
+      }
+    })
+  </script>

@@ -27,11 +27,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="dt-authentication-behavior.html">
+
+<link rel="import" href="shared-styles.html">
 <dom-module id="my-app">
 
   <template>
 
-    <style>
+    <style include="shared-styles">
 
       :host {
         display: block;
@@ -82,8 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-location id="location" route="{{route}}" query-params="{{queryParams}}"></app-location>
     <app-route
         route="{{route}}"
-        pattern="/plan/:id"
-        data="{{planRouteData}}"></app-route>
+        pattern="/product/:id"
+        data="{{productRouteData}}"></app-route>
     <app-route
         route="{{route}}"
         pattern="/wishlist/:id/customize"
@@ -127,7 +129,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <app-header condenses reveals fixed effects="waterfall">
           <app-toolbar>
-            <div class="title">My App</div>
+            <div class="title"><a href="/" class="no-style">My App</a></div>
             <paper-input label="Search" class="main-title" no-label-float type="search" value="{{queryParams.search}}">
               <iron-icon icon="search" prefix></iron-icon>
             </paper-input>
@@ -147,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
           <page-home name="home"></page-home>
           <page-search id="pageSearch" name="search" route="{{route}}" search="{{queryParams.search}}"></page-search>
-          <page-plan name="plan" id="pagePlan" product-id="{{planRouteData.id}}"></page-plan>
+          <page-product name="product" id="pageProduct" product-id="{{productRouteData.id}}"></page-product>
           <page-wishlist name="wishlist" id="pageWishlist"></page-wishlist>
           <page-wishlist-customize name="wishlist-customize" id="pageWishlistCustomize"></page-wishlist-customize>
           <page-admin name="admin" id="pageAdmin"></page-admin>

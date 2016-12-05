@@ -1,0 +1,175 @@
+
+
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="dt-product-image-slider.html">
+<link rel="import" href="x-collapse.html">
+<link rel="import" href="dt-ajax.html">
+<link rel="import" href="dt-add-item-to-wishlist-behavior.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<dom-module id="page-product">
+
+  <template>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .contentContainer {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        @apply(--layout-center-justified);
+      }
+
+      paper-card {
+        display:block;
+        @apply(--layout-flex-1);
+         @apply(--layout-self-start);
+        margin: 1em;
+      }
+
+      .product-header {
+        @apply(--paper-font-headline);
+      }
+
+      .product-header iron-image {
+        width: 48px;
+        height: 48px;
+        border-radius: 48px;
+      }
+
+      .image-reel iron-image {
+        width: 120px;
+        height: 80px;
+      }
+
+      .product-header {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+      }
+
+      .product-header iron-image {
+        margin-right: 0.6em;
+      }
+      @media all and (min-width: 480px) and (max-width: 1920px) {
+        paper-card {
+          max-width: 720px;
+          margin: 2em;
+        }
+      }
+    </style>
+    <div class="contentContainer">
+
+      <paper-card >
+          <div class="card-content">
+            <div class="product-header">
+              <iron-image sizing="contain" src="https://dummyimage.com/120x120/aaa/fff&text=++"></iron-image>
+              <span>{{product.name}}</span>
+            </div>
+            <div class="image-reel">
+              <dt-product-image-slider images="{{product.images}}"></dt-product-image-slider>
+            </div>
+
+            <x-collapse heading="Details">
+              <div class="collapse-content">
+                {{product.description}}
+              </div>
+            </x-collapse>
+
+            <x-collapse heading="Customizations">
+              <div class="collapse-content">
+                <template is="dom-repeat" items="{{product.customizations}}">
+                  <h4>{{item.name}}</h4>
+                  <p>
+                    {{item.description}}
+                  </p>
+                </template>
+              </div>
+            </x-collapse>
+
+          </div>
+          <div class="card-actions">
+            <paper-button on-tap="onAddToWishlistTapped">Add to Wishlist</paper-button>
+          </div>
+        </paper-card>
+    </div>
+
+    <paper-toast id="addToWishlistToast" duration="0" >
+      <span hidden$="[[addToWishlistError]]">Success</span>
+      <span hidden$="[[!addToWishlistError]]">
+        <span>Error: {{addToWishlistError.message}}</span>
+        <paper-button hidden$="[[!addToWishlistError.notAuthenticated]]" on-tap="onToastLoginTapped" class="green-button">Login</paper-button>
+      </span>
+      <paper-button on-tap="onToastCloseTapped">X</paper-button>
+    </paper-toast>
+
+    <dt-ajax
+        id="ajaxProduct"
+        path="/products/{{productId}}"
+        last-response="{{product}}"></dt-ajax>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-product',
+      behaviors: [AuthenticationBehavior, AddItemToWishlistBevhavior],
+      properties: {
+        product: {
+          type:Object,
+          notify:true,
+          value: function(){return {}}
+        },
+        productId: {
+          type: Number,
+          notify: true
+        }
+      },
+      ready: function() {
+        this.viewed();
+      },
+      viewed: function () {
+        this.$.ajaxProduct.generateRequest();
+      },
+      onAddToWishlistTapped: function() {
+        this.wishlistItemId = this.productId;
+        this.addItemToWishlistHelper();
+      },
+      addItemToWishlistHelper: function() {
+        var self = this;
+        this.addItemToWishlist(self.wishlistItemId)
+          .then(function(){
+              self.addToWishlistError = null;
+              self.$.addToWishlistToast.open();
+              self.wishlistItemId = undefined;
+            }.bind(self))
+          .catch(function(error) {
+              self.addToWishlistError = error;
+              self.$.addToWishlistToast.open();
+            }.bind(self));
+      },
+      onToastLoginTapped: function() {
+        this.$.addToWishlistToast.close();
+        var self = this;
+        this.login()
+          .then(function() {
+            self.addItemToWishlistHelper();
+          });
+      },
+      onToastCloseTapped: function() {
+        this.$.addToWishlistToast.close();
+      }
+    });
+
+  </script>
+
+</dom-module>

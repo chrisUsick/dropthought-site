@@ -24,6 +24,7 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="dt-add-item-to-wishlist-behavior.html">
 <link rel="import" href="dt-ajax.html">
+<link rel="import" href="dt-product-card.html">
 <dom-module id="page-search">
 
   <template>
@@ -51,19 +52,6 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         background-color: #fff;
       }
 
-      paper-card {
-        display:block;
-        @apply(--layout-flex-1);
-         @apply(--layout-self-start);
-        margin: 1em;
-      }
-
-      @media all and (min-width: 480px) and (max-width: 1920px) {
-        paper-card {
-          max-width: 350px;
-          margin: 2em;
-        }
-      }
       .green-button {
         color: var(--paper-green-500);
       }
@@ -79,15 +67,18 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
       </div>
       <div class="products">
         <template id="productsRepeater" is="dom-repeat" items="{{products}}" filter="filterProducts">
-          <paper-card heading="{{item.name}}" image="https://dummyimage.com/640x480/aaa/fff&text=blah">
+          <!-- <paper-card heading="{{item.name}}" image="https://dummyimage.com/640x480/aaa/fff&text=blah">
             <div class="card-content">
               {{item.description}}
             </div>
+
+          </paper-card> -->
+          <dt-product-card product="{{item}}">
             <div class="card-actions">
               <paper-button on-tap="learnMore" plan-id="[[item.id]]">Learn More</paper-button>
               <paper-button on-tap="onAddToWishlistTapped" product-id="[[item.id]]">Add to Wishlist</paper-button>
             </div>
-          </paper-card>
+          </dt-product-card>
         </template>
       </div>
 
@@ -149,7 +140,7 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
       },
       behaviors: [AuthenticationBehavior, AddItemToWishlistBevhavior],
       learnMore: function(e) {
-        this.set('route.path', '/plan/' + e.target.planId);
+        this.set('route.path', '/product/' + e.target.planId);
         this.set('search', '');
       },
       ready: function() {
@@ -186,14 +177,14 @@ based of of demo: https://polymerelements.github.io/app-layout/templates/landing
         var self = this;
         this.addItemToWishlist(self.wishlistItemId)
           .then(function(){
-            self.addToWishlistError = null;
-            self.$.addToWishlistToast.open();
-            self.wishlistItemId = undefined;
-          }.bind(self))
+              self.addToWishlistError = null;
+              self.$.addToWishlistToast.open();
+              self.wishlistItemId = undefined;
+            }.bind(self))
           .catch(function(error) {
-            self.addToWishlistError = error;
-            self.$.addToWishlistToast.open();
-          }.bind(self));
+              self.addToWishlistError = error;
+              self.$.addToWishlistToast.open();
+            }.bind(self));
       },
       onToastLoginTapped: function() {
         this.$.addToWishlistToast.close();
